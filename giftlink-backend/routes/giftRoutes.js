@@ -1,65 +1,59 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const connectToDatabase = require('../models/db');
-const logger = require('../logger');
+const connectToDatabase = require("../models/db");
+const logger = require("../logger");
 
-router.get('/', async (req, res) => {
-    logger.info('/ called');
-    try {
-        // Task 1: Connect to MongoDB and store connection to db constant
-        const db = await connectToDatabase();
+// Get all gifts
+router.get("/", async (req, res) => {
+  logger.info("📦 Fetching all gifts");
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gifts");
 
-        // Task 2: use the collection() method to retrieve the gift collection
-        const collection = db.collection("gifts");
-
-        // Task 3: Fetch all gifts using the collection.find method. Chain with toArray method to convert to JSON array
-        const gifts = await collection.find({}).toArray();
-
-        // Task 4: return the gifts using the res.json method
-        res.json(gifts);
-    } catch (e) {
-        logger.console.error('Error fetching gifts:', e);
-        res.status(500).send('Error fetching gifts');
-    }
+    const gifts = await collection.find({}).toArray();
+    return res.status(200).json(gifts);
+  } catch (e) {
+    logger.error("❌ Error fetching gifts:", e);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-router.get('/:id', async (req, res) => {
-    try {
-        // Task 1: Connect to MongoDB and store connection to db constant
-        const db = await connectToDatabase();
+// Get a gift by custom id
+router.get("/:id", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gifts");
 
-        // Task 2: use the collection() method to retrieve the gift collection
-        const collection = db.collection("gifts");
+    const id = req.params.id;
+    const gift = await collection.findOne({ id: id });
 
-        const id = req.params.id;
-
-        // Task 3: Find a specific gift by ID using the collection.fineOne method and store in constant called gift
-        const gift = await collection.findOne({ id: id });
-
-        if (!gift) {
-            return res.status(404).send('Gift not found');
-        }
-
-        res.json(gift);
-    } catch (e) {
-        console.error('Error fetching gift:', e);
-        res.status(500).send('Error fetching gift');
+    if (!gift) {
+      logger.error("🔍 Gift not found");
+      return res.status(404).send("Gift not found");
     }
+
+    return res.status(200).json(gift);
+  } catch (e) {
+    logger.error("❌ Error fetching gift:", e);
+    return res.status(500).send("Internal Server Error");
+  }
 });
-
-
 
 // Add a new gift
-router.post('/', async (req, res, next) => {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection("gifts");
-        const gift = await collection.insertOne(req.body);
+router.post("/", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gifts");
 
-        res.status(201).json(gift.ops[0]);
-    } catch (e) {
-        next(e);
-    }
+    // Insert the new gift
+    const gift = await collection.insertOne(req.body);
+
+    logger.info("✅ Gift added successfully");
+    return res.status(201).json(gift.ops[0]);
+  } catch (e) {
+    logger.error("❌ Error adding gift", e);
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = router;
