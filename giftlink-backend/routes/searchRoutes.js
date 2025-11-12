@@ -1,41 +1,46 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const connectToDatabase = require('../models/db');
+const connectToDatabase = require("../models/db");
+const logger = require("../logger");
 
 // Search for gifts
-router.get('/', async (req, res, next) => {
-    try {
-        // Task 1: Connect to MongoDB using connectToDatabase database. Remember to use the await keyword and store the connection in `db`
-        const db = await connectToDatabase();
+router.get("/", async (req, res) => {
+  logger.info("🔎 Search request received", { query: req.query });
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gifts");
 
-        const collection = db.collection("gifts");
+    // Initialize the query object
+    let query = {};
 
-        // Initialize the query object
-        let query = {};
-
-        // Task 2: Add the name filter to the query if the name parameter is not empty
-        if (req.query.name && req.query.name.trim() !== '') {
-            query.name = { $regex: req.query.name, $options: "i" }; // Using regex for partial match, case-insensitive
-        }
-
-        // Task 3: Add other filters to the query
-        if (req.query.category) {
-            query.category = req.query.category;
-        }
-        if (req.query.condition) {
-            query.condition = req.query.condition;
-        }
-        if (req.query.age_years) {            
-            query.age_years = { $lte: parseInt(req.query.age_years) };
-        }
-
-        // Task 4: Fetch filtered gifts using the find(query) method. Make sure to use await and store the result in the `gifts` constant
-        const gifts = await collection.find(query).toArray();
-
-        res.json(gifts);
-    } catch (e) {
-        next(e);
+    // Name filter (case-insensitive partial match)
+    if (req.query.name && req.query.name.trim() !== "") {
+      query.name = { $regex: req.query.name, $options: "i" };
     }
+
+    // Category filter
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+
+    // Condition filter
+    if (req.query.condition) {
+      query.condition = req.query.condition;
+    }
+
+    // Age filter
+    if (req.query.age_years) {
+      query.age_years = { $lte: parseInt(req.query.age_years) };
+    }
+
+    const gifts = await collection.find(query).toArray();
+
+    logger.info(`✅ Found ${gifts.length} gifts matching search criteria`);
+    return res.status(200).json(gifts);
+  } catch (e) {
+    logger.error("❌ Error searching gifts", e);
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = router;
