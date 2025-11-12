@@ -4,7 +4,7 @@ const connectToDatabase = require("../models/db");
 const logger = require("../logger");
 
 // Search for gifts
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   logger.info("🔎 Search request received", { query: req.query });
   try {
     const db = await connectToDatabase();
@@ -38,8 +38,7 @@ router.get("/", async (req, res) => {
     logger.info(`✅ Found ${gifts.length} gifts matching search criteria`);
     return res.status(200).json(gifts);
   } catch (e) {
-    logger.error("❌ Error searching gifts", e);
-    return res.status(500).send("Internal Server Error");
+    next(e);
   }
 });
 

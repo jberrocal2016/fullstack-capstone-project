@@ -18,7 +18,7 @@ const logger = pino();
 const router = express.Router();
 
 // Register
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   try {
     const db = await connectToDatabase();
     const collection = db.collection("users");
@@ -50,13 +50,12 @@ router.post("/register", async (req, res) => {
     logger.info("✅ User registered successfully");
     res.status(201).json({ authtoken, email: req.body.email });
   } catch (e) {
-    logger.error("❌ Internal server error", e);
-    return res.status(500).send("Internal server error");
+    next(e);
   }
 });
 
 // Login
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   try {
     const db = await connectToDatabase();
     const collection = db.collection("users");
@@ -83,15 +82,12 @@ router.post("/login", async (req, res) => {
       userEmail: theUser.email,
     });
   } catch (e) {
-    logger.error("❌ Internal server error", e);
-    return res
-      .status(500)
-      .json({ error: "Internal server error", details: e.message });
+    next(e);
   }
 });
 
 // Update User
-router.put("/update", async (req, res) => {
+router.put("/update", async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     logger.error("⚠️ Validation errors in update request", errors.array());
@@ -133,9 +129,8 @@ router.put("/update", async (req, res) => {
 
     logger.info("✅ User updated successfully");
     res.json({ authtoken });
-  } catch (error) {
-    logger.error("❌ Internal server error", error);
-    return res.status(500).send("Internal Server Error");
+  } catch (e) {
+    next(e);
   }
 });
 
