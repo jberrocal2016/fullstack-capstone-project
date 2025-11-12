@@ -1,34 +1,33 @@
 // db.js
-require('dotenv').config();
-const MongoClient = require('mongodb').MongoClient;
+require("dotenv").config();
+const { MongoClient } = require("mongodb");
 
-// MongoDB connection URL with authentication options
+// Database configuration
 let url = `${process.env.MONGO_URL}`;
-
-let dbInstance = null;
 const dbName = "giftdb";
 
+let dbInstance = null;
+
 async function connectToDatabase() {
-    if (dbInstance){
-        return dbInstance
-    };
+  if (dbInstance) {
+    return dbInstance;
+  }
 
-    const client = new MongoClient(url);      
+  const client = new MongoClient(url);
 
-    try {
-        // Task 1: Connect to MongoDB
-        await client.connect();
+  try {
+    // Connect to MongoDB
+    await client.connect();
 
-        // Task 2: Connect to database giftDB and store in variable dbInstance
-        dbInstance = client.db(dbName);
+    // Select database
+    dbInstance = client.db(dbName);
 
-        // Task 3: Return database instance
-        return dbInstance;
-    } catch (err) {
-        console.error("❌ Failed to connect to MongoDB:", err.message);
-        // Optionally rethrow a custom error so higher-level code can handle it
-        throw new Error("Database connection failed");
-    }
+    // Return database instance
+    return dbInstance;
+  } catch (err) {
+    console.error("❌ Failed to connect to MongoDB:", err.message);
+    throw new Error("Database connection failed");
+  }
 }
 
 module.exports = connectToDatabase;
