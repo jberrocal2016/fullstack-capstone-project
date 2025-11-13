@@ -2,55 +2,45 @@ const express = require("express");
 const router = express.Router();
 const connectToDatabase = require("../models/db");
 const logger = require("../logger");
+const asyncWrapper = require("../util/asyncWrapper");
 
 // Get all gifts
-router.get("/", async (req, res, next) => {
+router.get("/", asyncWrapper(async (req, res) => {
   logger.info("📦 Fetching all gifts");
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gifts");
-
-    const gifts = await collection.find({}).toArray();
-    return res.status(200).json(gifts);
-  } catch (e) {
-    next(e);
-  }
-});
+  const db = await connectToDatabase();
+  const gifts = await  db.collection("gifts").find({}).toArray();
+  
+  logger.info({ count: gifts.length }, "✅ Gifts fetched successfully");
+  res.status(200).json(gifts);  
+}));
 
 // Get a gift by custom id
-router.get("/:id", async (req, res, next) => {
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gifts");
+router.get("/:id", asyncWrapper(async (req, res) => {
+  const id = req.params.id;
+  logger.info({ id }, "🔍 Fetching gift by id");
 
-    const id = req.params.id;
-    const gift = await collection.findOne({ id: id });
+  const db = await connectToDatabase();
+  const gift = await db.collection("gifts").findOne({ id });
 
-    if (!gift) {
-      logger.error("🔍 Gift not found");
-      return res.status(404).send("Gift not found");
-    }
-
-    return res.status(200).json(gift);
-  } catch (e) {
-    next(e);
+  if (!gift) {
+    logger.error({ id }, "❌ Gift not found");
+    return res.status(404).json( {error: "Gift not found" });
   }
-});
+
+  logger.info({ id }, "✅ Gift found");
+  res.status(200).json(gift);  
+}));
 
 // Add a new gift
-router.post("/", async (req, res, next) => {
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gifts");
+router.post("/", asyncWrapper(async (req, res) => {
+  logger.info({ body: req.body }, "📦 Adding new gift");
+  
+  const db = await connectToDatabase();
+  // Insert the new gift
+  const gift = await db.collection("gifts").insertOne(req.body);
 
-    // Insert the new gift
-    const gift = await collection.insertOne(req.body);
-
-    logger.info("✅ Gift added successfully");
-    return res.status(201).json(gift.ops[0]);
-  } catch (e) {
-    next(e);
-  }
-});
+  logger.info({ insertedId: gift.insertedId }, "✅ Gift added successfully");
+  res.status(201).json(gift.ops[0]);
+}));
 
 module.exports = router;

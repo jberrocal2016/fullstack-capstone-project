@@ -5,7 +5,7 @@ const cors = require("cors");
 const pinoHttp = require("pino-http");
 const logger = require("./logger");
 const connectToDatabase = require("./models/db");
-//const { loadData } = require("./util/import-mongo/index");
+const { loadData } = require("./util/import-mongo/index");
 
 // Route imports
 const giftRoutes = require("./routes/giftRoutes");
