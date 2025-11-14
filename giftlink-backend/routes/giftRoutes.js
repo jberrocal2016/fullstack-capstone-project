@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const connectToDatabase = require("../models/db");
+const { connectToDatabase } = require("../models/db");
 const logger = require("../logger");
 const asyncWrapper = require("../util/asyncWrapper");
 

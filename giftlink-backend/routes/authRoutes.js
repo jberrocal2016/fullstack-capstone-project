@@ -6,16 +6,15 @@ const { body, validationResult } = require("express-validator");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const pino = require("pino");
 
 // Local modules
-const connectToDatabase = require("../models/db");
+const { connectToDatabase } = require("../models/db");
 const asyncWrapper = require("../util/asyncWrapper");
+const logger = require("../logger");
 
 // Config
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
-const logger = pino();
 const router = express.Router();
 
 // Register
@@ -66,7 +65,7 @@ router.post("/login", asyncWrapper(async (req, res) => {
 
   const result = await bcryptjs.compare(req.body.password, theUser.password);
   if (!result) {
-    logger.error("🚫 Passwors do not match");
+    logger.error("🚫 Passwords do not match");
     return res.status(401).json({ error: "Wrong password" });
   }
 
