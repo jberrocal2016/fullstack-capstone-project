@@ -4,7 +4,9 @@ const express = require("express");
 const cors = require("cors");
 const pinoHttp = require("pino-http");
 const logger = require("./logger");
-const connectToDatabase = require("./models/db");
+const { connectToDatabase, closeDatabase } = require("./models/db");
+
+// Loads sample data
 const { loadData } = require("./util/import-mongo/index");
 
 // Route imports
@@ -16,14 +18,9 @@ const app = express();
 const port = process.env.PORT || 3060;
 
 // Middleware
-app.use("*", cors());
+app.use(cors());
 app.use(express.json());
 app.use(pinoHttp({ logger }));
-
-// Connect to MongoDB once at startup
-connectToDatabase()
-  .then(() => logger.info("✅ Connected to DB"))
-  .catch((e) => logger.error("❌ Failed to connect to DB", e));
 
 // Routes
 app.use("/api/gifts", giftRoutes);
@@ -43,10 +40,29 @@ app.use((req, res) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   logger.error({ err }, "❌ Unhandled error");
-  res.status(500).send("Internal Server Error");
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
-// Start server
-app.listen(port, () => {
-  console.log(`🌐 Server running on port ${port}`);
+// Connect to DB and start server
+connectToDatabase()
+  .then(() => {
+    logger.info("✅ Connected to DB");
+    app.listen(port, () => {
+      console.log(`🌐 Server running on port ${port}`);
+    });
+  })
+  .catch((e) => {
+    logger.error("❌ Failed to connect to DB", e);
+    process.exit(1);
+  });
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  await closeDatabase();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await closeDatabase();
+  process.exit(0);
 });
