@@ -78,8 +78,16 @@ function DetailsPage() {
   ];
 
   // Handle loading, showerr, or missing gift
-  if (loading)
-    return <div className="spinner-border text-primary" role="status"></div>;
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "200px" }}
+      >
+        <div className="spinner-border text-primary" role="status"></div>
+      </div>
+    );
+  }
   if (showerr)
     return <div className="alert alert-danger">Error: {showerr}</div>;
   if (!gift) return <div>Gift not found</div>;
