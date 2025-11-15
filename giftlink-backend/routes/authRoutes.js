@@ -37,7 +37,7 @@ router.post(
     // Validation rules for inputs
     body("email").isEmail().withMessage("Valid email required"),
     body("password")
-      .isLength({ min: 8 })
+      .isLength({ min: 6 })
       .withMessage("Password must be at least 8 chars"),
     body("firstName").notEmpty().withMessage("First name required"),
     body("lastName").notEmpty().withMessage("Last name required"),
