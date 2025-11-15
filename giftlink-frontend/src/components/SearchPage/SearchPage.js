@@ -7,7 +7,11 @@ function SearchPage() {
   // State for search inputs and results
   const [searchQuery, setSearchQuery] = useState("");
   const [ageRange, setAgeRange] = useState(6); // Initialize with minimum value
+  const [category, setCategory] = useState("");
+  const [condition, setCondition] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Dropdown options
   const categories = ["Living", "Bedroom", "Bathroom", "Kitchen", "Office"];
@@ -28,7 +32,9 @@ function SearchPage() {
         const data = await response.json();
         setSearchResults(data);
       } catch (error) {
-        console.error("Fetch error:", error.message);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -37,12 +43,13 @@ function SearchPage() {
 
   // Fetch search results based on filters
   const handleSearch = async () => {
+    setLoading(true);
     const baseUrl = `${urlConfig.backendUrl}/api/search?`;
     const queryParams = new URLSearchParams({
       name: searchQuery,
       age_years: ageRange,
-      category: document.getElementById("categorySelect").value,
-      condition: document.getElementById("conditionSelect").value,
+      category,
+      condition,
     }).toString();
 
     try {
@@ -53,7 +60,9 @@ function SearchPage() {
       const data = await response.json();
       setSearchResults(data);
     } catch (error) {
-      console.error("Failed to fetch search results:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,6 +70,21 @@ function SearchPage() {
   const goToDetailsPage = (productId) => {
     navigate(`/app/product/${productId}`);
   };
+
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "200px" }}
+      >
+        <div className="spinner-border text-primary" role="status"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="alert alert-danger">Error: {error}</div>;
+  }
 
   return (
     <div className="container mt-5">
@@ -72,22 +96,32 @@ function SearchPage() {
             <div className="d-flex flex-column">
               {/* Category dropdown */}
               <label htmlFor="categorySelect">Category</label>
-              <select id="categorySelect" className="form-control my-1">
+              <select
+                id="categorySelect"
+                className="form-control my-1"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
                 <option value="">All</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
                   </option>
                 ))}
               </select>
 
               {/* Condition dropdown */}
               <label htmlFor="conditionSelect">Condition</label>
-              <select id="conditionSelect" className="form-control my-1">
+              <select
+                id="conditionSelect"
+                className="form-control my-1"
+                value={condition}
+                onChange={(e) => setCondition(e.target.value)}
+              >
                 <option value="">All</option>
-                {conditions.map((condition) => (
-                  <option key={condition} value={condition}>
-                    {condition}
+                {conditions.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
                   </option>
                 ))}
               </select>
