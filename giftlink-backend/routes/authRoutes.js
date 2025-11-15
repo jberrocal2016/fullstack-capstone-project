@@ -38,7 +38,7 @@ router.post(
     body("email").isEmail().withMessage("Valid email required"),
     body("password")
       .isLength({ min: 6 })
-      .withMessage("Password must be at least 8 chars"),
+      .withMessage("Password must be at least 6 chars"),
     body("firstName").notEmpty().withMessage("First name required"),
     body("lastName").notEmpty().withMessage("Last name required"),
   ],
@@ -143,13 +143,7 @@ router.put(
 
     // Normalize ObjectId conversion
     const { ObjectId } = require("mongodb");
-    let userId;
-    try {
-      userId = new ObjectId(req.user.user.id); // always stored as string in JWT
-    } catch (err) {
-      logger.error("Invalid user ID in token");
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
+    const userId = new ObjectId(req.user.user.id);
 
     // Identify user by JWT payload instead of headers
     const existingUser = await collection.findOne({ _id: userId });
