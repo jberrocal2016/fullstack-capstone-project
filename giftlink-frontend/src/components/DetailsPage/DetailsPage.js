@@ -112,25 +112,25 @@ function DetailsPage() {
 
           {/* Gift details */}
           <p>
-            <strong>Category:</strong>
+            <strong>Category: </strong>
             {gift.category}
           </p>
           <p>
-            <strong>Condition:</strong>
+            <strong>Condition: </strong>
             {gift.condition}
           </p>
           <p>
-            <strong>Date Added:</strong>
+            <strong>Date Added: </strong>
             {gift.date_added
               ? new Date(gift.date_added * 1000).toLocaleDateString()
               : "N/A"}
           </p>
           <p>
-            <strong>Age (Years):</strong>
+            <strong>Age (Years): </strong>
             {gift.age_years}
           </p>
           <p>
-            <strong>Description:</strong>
+            <strong>Description: </strong>
             {gift.description}
           </p>
         </div>
