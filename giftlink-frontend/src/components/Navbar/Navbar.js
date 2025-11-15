@@ -82,7 +82,7 @@ function Navbar() {
             <>
               <li className="nav-item">
                 <span
-                  className="nav-link"
+                  className="nav-link text-dark"
                   style={{ cursor: "pointer" }}
                   onClick={() => navigate("/app/profile")}
                 >
@@ -91,7 +91,7 @@ function Navbar() {
               </li>
               <li className="nav-item">
                 <button
-                  className="btn btn-link nav-link"
+                  className="btn btn-success text-white"
                   onClick={handleLogout}
                 >
                   Logout
