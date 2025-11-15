@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { urlConfig } from "../../config";
-import { useAppContext } from "../../context/AuthContext";
+import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
@@ -14,7 +14,7 @@ function LoginPage() {
 
   // Hooks for navigation and auth context
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useAppContext();
+  const { setIsLoggedIn } = useAuthContext();
 
   // Optional bearer token if already stored
   const bearerToken = sessionStorage.getItem("bearer-token");

@@ -14,7 +14,7 @@ function AuthProvider({ children }) {
   };
 
   // Provide the value to all children components
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 // Custom hook for consuming the AuthContext

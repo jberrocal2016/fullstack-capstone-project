@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import { urlConfig } from "../../config";
-import { useAppContext } from "../../context/AuthContext";
+import { useAuthContext } from "../../context/AuthContext";
 
 const Profile = () => {
   // State for user details and editable copy
@@ -10,7 +10,7 @@ const Profile = () => {
   const [updatedDetails, setUpdatedDetails] = useState({});
 
   // Context for updating global user name
-  const { setUserName } = useAppContext();
+  const { setUserName } = useAuthContext();
 
   // State for edit mode and success message
   const [editMode, setEditMode] = useState(false);

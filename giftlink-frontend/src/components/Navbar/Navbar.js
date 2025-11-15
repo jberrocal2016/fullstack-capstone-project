@@ -62,9 +62,9 @@ function Navbar() {
       >
         <ul className="navbar-nav">
           <li className="nav-item">
-            <Link className="nav-link" to="/app">
+            <a className="nav-link" href="/home.html">
               Home
-            </Link>
+            </a>
           </li>
           <li className="nav-item">
             <Link className="nav-link" to="/app">
@@ -100,8 +100,8 @@ function Navbar() {
             </>
           ) : (
             <>
-              <li className="nav-item">
-                <Link className="nav-link" to="/app/login">
+              <li className="nav-item ms-2">
+                <Link className="btn btn-success text-white" to="/app/login">
                   Login
                 </Link>
               </li>
