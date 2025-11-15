@@ -4,13 +4,15 @@ import { urlConfig } from "../../config";
 
 function MainPage() {
   const [gifts, setGifts] = useState([]); // Holds list of gifts from backend
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch all gifts from backend when component mounts
     const fetchGifts = async () => {
       try {
-        let url = `${urlConfig.backendUrl}/api/gifts`;
+        const url = `${urlConfig.backendUrl}/api/gifts`;
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error; ${response.status}`);
@@ -18,7 +20,9 @@ function MainPage() {
         const data = await response.json();
         setGifts(data);
       } catch (error) {
-        console.error("Fetch error: " + error.message);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,6 +50,10 @@ function MainPage() {
       ? "list-group-item-success"
       : "list-group-item-warning";
   };
+
+  if (loading)
+    return <div className="spinner-border text-primary" role="status"></div>;
+  if (error) return <div className="alert alert-danger">Error: {error}</div>;
 
   return (
     <div className="container mt-5">
