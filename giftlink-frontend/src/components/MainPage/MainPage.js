@@ -51,8 +51,17 @@ function MainPage() {
       : "list-group-item-warning";
   };
 
-  if (loading)
-    return <div className="spinner-border text-primary" role="status"></div>;
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "200px" }}
+      >
+        <div className="spinner-border text-primary" role="status"></div>
+      </div>
+    );
+  }
+
   if (error) return <div className="alert alert-danger">Error: {error}</div>;
 
   return (
