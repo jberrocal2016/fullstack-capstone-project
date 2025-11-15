@@ -73,7 +73,7 @@ router.post(
     });
 
     // Create JWT with expiration for security
-    const payload = { user: { id: newUser.insertedId } };
+    const payload = { user: { id: newUser.insertedId.toString() } };
     const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
     logger.info("✅ User registered successfully");
