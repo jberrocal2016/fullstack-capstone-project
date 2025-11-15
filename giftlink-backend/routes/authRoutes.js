@@ -138,33 +138,38 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const email = req.headers.email;
+    if (!email) {
+      logger.error("⚠️ Email not found in request headers");
+      return res
+        .status(400)
+        .json({ error: "Email not found in request headers" });
+    }
+
     const db = await connectToDatabase();
     const collection = db.collection("users");
 
-    // Normalize ObjectId conversion
-    const { ObjectId } = require("mongodb");
-    const userId = new ObjectId(req.user.user.id);
-
     // Identify user by JWT payload instead of headers
-    const existingUser = await collection.findOne({ _id: userId });
+    const existingUser = await collection.findOne({ email });
     if (!existingUser) {
       logger.error("🔍 User not found");
       return res.status(404).json({ error: "User not found" });
     }
+
     // Only update specific fields, not overwrite entire user object
     const updateFields = {};
     if (req.body.name) updateFields.firstName = req.body.name;
     updateFields.updatedAt = new Date();
 
     const updatedUser = await collection.findOneAndUpdate(
-      { _id: userId },
+      { email },
       { $set: updateFields },
       { returnDocument: "after" }
     );
 
     // Defensive check: ensure update succeeded
     if (!updatedUser.value) {
-      logger.error("Update failed, user not found after update");
+      logger.error("🔍 Update failed, user not found after update");
       return res.status(404).json({ error: "User not found after update" });
     }
 
