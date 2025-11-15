@@ -82,8 +82,8 @@ function MainPage() {
 
                 {/* Button to navigate to details page */}
                 <button
-                  onClick={() => goToDetailsPage(gift.id)}
                   className="btn btn-primary"
+                  onClick={() => goToDetailsPage(gift.id)}
                 >
                   View Details
                 </button>

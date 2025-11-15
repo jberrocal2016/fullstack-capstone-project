@@ -1,16 +1,25 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext } from "react";
 
-const AppContext = createContext();
+// Create the AuthContext object
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
-  return (
-    <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn, userName, setUserName }}>
-      {children}
-    </AppContext.Provider>
-  );
-};
+  // Group state + actions for clarity
+  const value = {
+    auth: { isLoggedIn, userName },
+    actions: { setIsLoggedIn, setUserName },
+  };
 
-export const useAppContext = () => useContext(AppContext);
+  // Provide the value to all children components
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+
+// Custom hook for consuming the AuthContext
+function useAuthContext() {
+  return useContext(AuthContext);
+}
+
+export { AuthProvider, useAuthContext };
