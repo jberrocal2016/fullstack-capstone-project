@@ -141,10 +141,18 @@ router.put(
     const db = await connectToDatabase();
     const collection = db.collection("users");
 
+    // Normalize ObjectId conversion
+    const { ObjectId } = require("mongodb");
+    let userId;
+    try {
+      userId = new ObjectId(req.user.user.id); // always stored as string in JWT
+    } catch (err) {
+      logger.error("Invalid user ID in token");
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
     // Identify user by JWT payload instead of headers
-    const existingUser = await collection.findOne({
-      _id: new require("mongodb").ObjectId(req.user.user.id),
-    });
+    const existingUser = await collection.findOne({ _id: userId });
     if (!existingUser) {
       logger.error("🔍 User not found");
       return res.status(404).json({ error: "User not found" });
@@ -155,16 +163,18 @@ router.put(
     updateFields.updatedAt = new Date();
 
     const updatedUser = await collection.findOneAndUpdate(
-      { _id: existingUser._id },
+      { _id: userId },
       { $set: updateFields },
       { returnDocument: "after" }
     );
 
-    const payload = {
-      user: {
-        id: updatedUser._id.toString(),
-      },
-    };
+    // Defensive check: ensure update succeeded
+    if (!updatedUser.value) {
+      logger.error("Update failed, user not found after update");
+      return res.status(404).json({ error: "User not found after update" });
+    }
+
+    const payload = { user: { id: updatedUser._id.toString() } };
     const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
     logger.info("✅ User updated successfully");
