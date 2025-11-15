@@ -11,7 +11,7 @@ function DetailsPage() {
   // Local state
   const [gift, setGift] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [showerr, setShowerr] = useState(null);
 
   // Runs when productID changes
   useEffect(() => {
@@ -19,6 +19,7 @@ function DetailsPage() {
     const authenticationToken = sessionStorage.getItem("auth-token");
     if (!authenticationToken) {
       navigate("/app/login");
+      return; // Stop execution if not authenticated
     }
 
     // Fetch gift details from backend
@@ -28,12 +29,12 @@ function DetailsPage() {
         const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new showerr("Network response was not ok");
         }
         const data = await response.json();
         setGift(data);
-      } catch (error) {
-        setError(error.message);
+      } catch (showerr) {
+        setShowerr(showerr.message);
       } finally {
         setLoading(false);
       }
@@ -76,9 +77,11 @@ function DetailsPage() {
     },
   ];
 
-  // Handle loading, error, or missing gift
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // Handle loading, showerr, or missing gift
+  if (loading)
+    return <div className="spinner-border text-primary" role="status"></div>;
+  if (showerr)
+    return <div className="alert alert-danger">Error: {showerr}</div>;
   if (!gift) return <div>Gift not found</div>;
 
   return (
@@ -132,6 +135,8 @@ function DetailsPage() {
           </p>
         </div>
       </div>
+
+      {/* Comments */}
       <div className="comments-section mt-4">
         <h3 className="mb-3">Comments</h3>
         {comments.map((comment, index) => (
