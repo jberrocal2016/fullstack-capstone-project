@@ -10,7 +10,8 @@ const Profile = () => {
   const [updatedDetails, setUpdatedDetails] = useState({});
 
   // Context for updating global user name
-  const { setUserName } = useAuthContext();
+  const { actions } = useAuthContext();
+  const { setUserName } = actions;
 
   // State for edit mode and success message
   const [editMode, setEditMode] = useState(false);
