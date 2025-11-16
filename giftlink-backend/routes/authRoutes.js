@@ -129,7 +129,10 @@ router.put(
   authenticateToken, // JWT auth instead of relying on headers
   [
     // Validation rules for update inputs
-    body("name").optional().notEmpty().withMessage("Name cannot be empty"),
+    body("firstName")
+      .optional()
+      .notEmpty()
+      .withMessage("First name cannot be empty"),
   ],
   asyncWrapper(async (req, res) => {
     const errors = validationResult(req);
@@ -158,7 +161,7 @@ router.put(
 
     // Only update specific fields, not overwrite entire user object
     const updateFields = {};
-    if (req.body.name) updateFields.firstName = req.body.name;
+    if (req.body.firstName) updateFields.firstName = req.body.firstName;
     updateFields.updatedAt = new Date();
 
     const updatedUser = await collection.findOneAndUpdate(

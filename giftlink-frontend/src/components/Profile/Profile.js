@@ -34,11 +34,11 @@ const Profile = () => {
     try {
       const authtoken = sessionStorage.getItem("auth-token");
       const email = sessionStorage.getItem("email");
-      const name = sessionStorage.getItem("name");
+      const firstName = sessionStorage.getItem("firstName");
 
       if (name || authtoken) {
         const storedUserDetails = {
-          name: name,
+          firstName: firstName,
           email: email,
         };
         setUserDetails(storedUserDetails);
@@ -75,7 +75,7 @@ const Profile = () => {
         return;
       }
 
-      const payload = { ...updatedDetails };
+      const payload = { firstName: updatedDetails.firstName };
       const response = await fetch(`${urlConfig.backendUrl}/api/auth/update`, {
         method: "PUT",
         headers: {
@@ -88,8 +88,8 @@ const Profile = () => {
 
       if (response.ok) {
         // Update context and session storage
-        setUserName(updatedDetails.name);
-        sessionStorage.setItem("name", updatedDetails.name);
+        setUserName(updatedDetails.firstName);
+        sessionStorage.setItem("firstName", updatedDetails.firstName);
 
         setUserDetails(updatedDetails);
         setEditMode(false);
@@ -125,8 +125,8 @@ const Profile = () => {
             Name
             <input
               type="text"
-              name="name"
-              value={updatedDetails.name || ""}
+              name="firstName"
+              value={updatedDetails.firstName || ""}
               onChange={handleInputChange}
             />
           </label>
@@ -136,7 +136,7 @@ const Profile = () => {
       ) : (
         // Display profile details
         <div className="profile-details">
-          <h1>Hi, {userDetails.name}</h1>
+          <h1>Hi, {userDetails.firstName}</h1>
           <p>
             <b>Email:</b> {userDetails.email}
           </p>
