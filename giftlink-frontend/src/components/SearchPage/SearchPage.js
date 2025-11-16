@@ -71,17 +71,6 @@ function SearchPage() {
     navigate(`/app/product/${productId}`);
   };
 
-  if (loading) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "200px" }}
-      >
-        <div className="spinner-border text-primary" role="status"></div>
-      </div>
-    );
-  }
-
   if (error) {
     return <div className="alert alert-danger">Error: {error}</div>;
   }
@@ -162,7 +151,17 @@ function SearchPage() {
 
           {/* Search results */}
           <div className="search-results mt-4">
-            {searchResults.length > 0 ? (
+            {loading ? (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: "100px" }}
+              >
+                <div
+                  className="spinner-border text-primary"
+                  role="status"
+                ></div>
+              </div>
+            ) : searchResults.length > 0 ? (
               searchResults.map((product) => (
                 <div key={product.id} className="card mb-3">
                   {/* Product image */}
