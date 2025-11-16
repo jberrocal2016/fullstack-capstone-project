@@ -172,8 +172,19 @@ router.put(
 
     // Defensive check: ensure update succeeded
     if (!updatedUser.value) {
-      logger.error("🔍 Update failed, user not found after update");
-      return res.status(404).json({ error: "User not found after update" });
+      // Check if the user still exists
+      const stillExists = await collection.findOne({ email });
+      if (stillExists) {
+        logger.info("✅ User update applied, but no new document returned");
+        return res
+          .status(200)
+          .json({
+            message: "Update applied",
+            authtoken: req.headers.authorization.split(" ")[1],
+          });
+      }
+      logger.error("❌ User not found for email:", email);
+      return res.status(404).json({ error: "User not found" });
     }
 
     const payload = { user: { id: updatedUser._id.toString() } };
