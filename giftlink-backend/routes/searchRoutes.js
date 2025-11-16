@@ -1,3 +1,4 @@
+/*jshint esversion: 8 */
 const express = require("express");
 const router = express.Router();
 const { connectToDatabase } = require("../models/db");
@@ -5,40 +6,45 @@ const logger = require("../logger");
 const asyncWrapper = require("../util/asyncWrapper");
 
 // Search for gifts
-router.get("/", asyncWrapper(async (req, res) => {
-  logger.info("🔎 Search request received", { query: req.query });
-  
-  const db = await connectToDatabase();
-  const collection = db.collection("gifts");
+router.get(
+  "/",
+  asyncWrapper(async (req, res) => {
+    logger.info("🔎 Search request received", { query: req.query });
 
-  // Initialize the query object
-  let query = {};
+    const db = await connectToDatabase();
+    const collection = db.collection("gifts");
 
-  // Name filter (case-insensitive partial match)
-  if (req.query.name && req.query.name.trim() !== "") {
-    query.name = { $regex: req.query.name, $options: "i" };
-  }
+    // Initialize the query object
+    let query = {};
 
-  // Category filter
-  if (req.query.category) {
-    query.category = req.query.category;
-  }
+    // Name filter (case-insensitive partial match)
+    if (req.query.name && req.query.name.trim() !== "") {
+      query.name = { $regex: req.query.name, $options: "i" };
+    }
 
-  // Condition filter
-  if (req.query.condition) {
-    query.condition = req.query.condition;
-  }
+    // Category filter
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
 
-  // Age filter
-  if (req.query.age_years) {
-    query.age_years = { $lte: parseInt(req.query.age_years) };
-  }
+    // Condition filter
+    if (req.query.condition) {
+      query.condition = req.query.condition;
+    }
 
-  const gifts = await collection.find(query).toArray();
+    // Age filter
+    if (req.query.age_years) {
+      query.age_years = { $lte: parseInt(req.query.age_years) };
+    }
 
-  logger.info({ count: gifts.length }, "✅ Found gifts matching search criteria");
-  res.status(200).json(gifts);
-  
-}));
+    const gifts = await collection.find(query).toArray();
+
+    logger.info(
+      { count: gifts.length },
+      "✅ Found gifts matching search criteria"
+    );
+    res.status(200).json(gifts);
+  })
+);
 
 module.exports = router;

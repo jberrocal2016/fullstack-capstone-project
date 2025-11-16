@@ -1,3 +1,4 @@
+/*jshint esversion: 8 */
 // Core packages
 const express = require("express");
 const { body, validationResult } = require("express-validator");
@@ -176,12 +177,10 @@ router.put(
       const stillExists = await collection.findOne({ email });
       if (stillExists) {
         logger.info("✅ User update applied, but no new document returned");
-        return res
-          .status(200)
-          .json({
-            message: "Update applied",
-            authtoken: req.headers.authorization.split(" ")[1],
-          });
+        return res.status(200).json({
+          message: "Update applied",
+          authtoken: req.headers.authorization.split(" ")[1],
+        });
       }
       logger.error("❌ User not found for email:", email);
       return res.status(404).json({ error: "User not found" });
