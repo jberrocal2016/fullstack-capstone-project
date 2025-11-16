@@ -141,17 +141,24 @@ function SearchPage() {
           </div>
 
           {/* Search input */}
-          <input
-            type="text"
-            className="form-control mb-2"
-            placeholder="Search for items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {/* Search button */}
-          <button className="btn btn-primary" onClick={handleSearch}>
-            Search
-          </button>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // prevent page reload
+              handleSearch();
+            }}
+          >
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Search for items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {/* Search button */}
+            <button type="submit" className="btn btn-primary">
+              Search
+            </button>{" "}
+          </form>
 
           {/* Search results */}
           <div className="search-results mt-4">
