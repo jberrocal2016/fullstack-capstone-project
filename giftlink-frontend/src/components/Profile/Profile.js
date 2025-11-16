@@ -36,7 +36,7 @@ const Profile = () => {
       const email = sessionStorage.getItem("email");
       const firstName = sessionStorage.getItem("firstName");
 
-      if (name || authtoken) {
+      if (firstName || authtoken) {
         const storedUserDetails = {
           firstName: firstName,
           email: email,
